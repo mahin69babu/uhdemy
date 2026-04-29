@@ -1,0 +1,9 @@
+
+beautifulsoup4
+cloudscraper
+loguru
+requests
+rich
+rookiepy
+lxml
+colorama

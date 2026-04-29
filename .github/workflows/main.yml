@@ -1,0 +1,49 @@
+name: Auto Udemy Enrollment
+
+on:
+  schedule:
+    - cron: "0 0 1 * *"  
+  workflow_dispatch:
+
+permissions:
+  actions: write
+
+jobs:
+  enroll:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Cancel Duplicate Runs
+        uses: styfle/cancel-workflow-action@0.9.0
+        with:
+          all_but_latest: true
+          access_token: ${{ github.token }}
+
+      - name: Set Up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run CLI to Enroll Courses
+        run: |
+          python cli.py
+
+      - name: Commit Updated Session (if needed)
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add .
+          git commit -m "auto: update session/cache" -a || true
+
+      - name: Push Changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ github.token }}
+          branch: main
